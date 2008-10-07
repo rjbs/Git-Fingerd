@@ -102,4 +102,11 @@ Clone URL: $cloneurl
   return $reply;
 }
 
+=begin Pod::Coverage
+
+  new
+  basedir
+
+=end Pod::Coverage
+
 1;
