@@ -3,11 +3,33 @@ use warnings;
 package Git::Fingerd;
 use Net::Finger::Server 0.003;
 BEGIN { our @ISA = qw(Net::Finger::Server); }
+# ABSTRACT: let people finger your git server for... some reason
 
 use List::Util qw(max);
 use SUPER;
 use String::Truncate qw(elide);
 use Text::Table;
+
+=head1 DESCRIPTION
+
+This module implements a simple C<finger> server that describes the contents of
+a server that hosts git repositories.  You can finger C<@servername> for a
+listing of repositories and finger C<repo@servername> for information about
+a single repository.
+
+This was meant to provide a simple example for Net::Finger::Server, but enough
+people asked for the code that I've released it as something reusable.  Here's
+an example program using Git::Fingerd:
+
+  #!/usr/bin/perl
+  use Git::Fingerd -run => {
+    isa     => 'Net::Server::INET',
+    basedir => '/var/lib/git',
+  };
+
+This program could then run out of F<xinetd>.
+
+=cut
 
 sub new {
   my ($class, %config) = @_;
