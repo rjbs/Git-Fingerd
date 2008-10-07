@@ -94,11 +94,10 @@ sub user_reply {
   my $desc     = -f "$dir/description" ? `cat $dir/description` : '(none)';
   chomp($cloneurl, $desc);
 
-  my $reply = <<"END_DESC";
-Project  : $username
+  my $reply = "Project  : $username
 Desc.    : $desc
 Clone URL: $cloneurl
-END_DESC
+";
 
   return $reply;
 }
