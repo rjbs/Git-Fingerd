@@ -5,7 +5,9 @@ use Net::Finger::Server 0.003;
 BEGIN { our @ISA = qw(Net::Finger::Server); }
 # ABSTRACT: let people finger your git server for... some reason
 
+use Git::PurePerl;
 use List::Util qw(max);
+use Path::Class;
 use SUPER;
 use String::Truncate qw(elide);
 use Text::Table;
@@ -28,6 +30,8 @@ an example program using Git::Fingerd:
   };
 
 This program could then run out of F<xinetd>.
+
+=for Pod::Coverage new basedir
 
 =cut
 
@@ -82,31 +86,42 @@ sub user_reply {
   my ($self, $username, $arg) = @_;
 
   my $basedir = $self->basedir;
-  my $dir = "$basedir/$username.git";
+  my $gitdir  = "$basedir/$username.git";
 
-  return "unknown repository\n" unless -d $dir;
+  return "unknown repository\n" unless -d $gitdir;
 
-  my $mode = (stat $dir)[2];
+  my $mode = (stat $gitdir)[2];
 
   return "unknown repository\n" unless $mode & 1;
 
-  my $cloneurl = -f "$dir/cloneurl"    ? `cat $dir/cloneurl`    : '(none)';
-  my $desc     = -f "$dir/description" ? `cat $dir/description` : '(none)';
+  my $repo    = Git::PurePerl->new({ gitdir => $gitdir });
+
+  my $cloneurl = file( $gitdir, 'cloneurl' )->slurp( chomp => 1 );
+  my $desc     = $repo->description;
   chomp($cloneurl, $desc);
+
+  my @refs = $repo->ref_names;
+  my @tags  = grep { s{^refs/tags/}{} } @refs;
+  my @heads = grep { s{^refs/heads/}{} } @refs;
 
   my $reply = "Project  : $username
 Desc.    : $desc
 Clone URL: $cloneurl
 ";
 
+  $reply .= "\n[heads]\n";
+  for my $head (sort @heads) {
+    my $sha = $repo->ref_sha1("refs/heads/$head");
+    $reply .= sprintf "%-15s = %s\n", $head, $sha;
+  }
+
+  $reply .= "\n[tags]\n";
+  for my $tag (sort @tags) {
+    my $sha = $repo->ref_sha1("refs/tags/$tag");
+    $reply .= sprintf "%-15s = %s\n", $tag, $sha;
+  }
+
   return $reply;
 }
-
-=begin Pod::Coverage
-
-  new
-  basedir
-
-=end Pod::Coverage
 
 1;
