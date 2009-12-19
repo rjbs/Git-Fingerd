@@ -1,4 +1,7 @@
-Revision log for Git-Fingerd
+Revision log for {{$dist->name}}
+
+{{$NEXT}}
+          use Git::PurePerl to get heads, tags, and README
 
 1.000     2008-10-06
           first release, by popular demand
