@@ -121,6 +121,15 @@ Clone URL: $cloneurl
     $reply .= sprintf "%-15s = %s\n", $tag, $sha;
   }
 
+  if (my $ref = $repo->ref("refs/heads/master")) {
+    my $tree = $ref->tree;
+    for ($tree->directory_entries) {
+      next unless $_->filename eq 'README';
+      my $obj = $_->object;
+      $reply .= "\n[README]\n" . $obj->content . "\n";
+    }
+  }
+
   return $reply;
 }
 
