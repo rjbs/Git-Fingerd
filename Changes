@@ -1,6 +1,7 @@
 Revision log for {{$dist->name}}
 
 {{$NEXT}}
+          update bugtracker, repo metadata
 
 2.093520  2009-12-18 22:22:26 America/New_York
           use Git::PurePerl to get heads, tags, and README
