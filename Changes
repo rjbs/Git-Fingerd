@@ -1,6 +1,7 @@
 Revision log for {{$dist->name}}
 
 {{$NEXT}}
+        - update metadata, repackage
 
 2.093521  2013-08-31 23:55:47 America/New_York
           update bugtracker, repo metadata
